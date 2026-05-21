@@ -1,0 +1,17 @@
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.ruff_cache/
+.venv/
+venv/
+.git/
+.tracepilot/
+apps/web/node_modules/
+apps/web/.next/
+node_modules/
+*.db
+*.sqlite3
+.env
+.env.local
+qdrant_storage/
+ollama/

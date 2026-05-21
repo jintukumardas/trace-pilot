@@ -1,0 +1,30 @@
+# Root workspace config: tooling only (ruff + pytest). Each package/app has its
+# own installable pyproject.toml under packages/* and apps/api.
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["apps/web", ".tracepilot", "**/templates"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+ignore = [
+    "E501",   # line length — handled by the formatter
+    "B008",   # function call in default arg — the FastAPI Depends() pattern
+    "B904",   # raise ... from — route handlers intentionally re-raise HTTPException plainly
+    "B905",   # zip() without strict= — zips here are over equal-length sequences by construction
+    "B034",   # re.split positional args — readable as written
+    "UP042",  # str+Enum — tracepilot_shared.StrEnum is a deliberate cross-version helper
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "tracepilot_shared", "tracepilot_prompts", "tracepilot_retrieval",
+    "tracepilot_agent", "tracepilot_tooling", "tracepilot_evals", "tracepilot_api",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra"
+filterwarnings = ["ignore::DeprecationWarning"]
