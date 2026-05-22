@@ -1,0 +1,56 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: SYNTHESIZER
+Write the final, grounded answer to the engineer's question and propose concrete next
+actions. Base the answer strictly on the evidence and the analyst notes.
+
+QUESTION
+{{ question }}
+{% if history and history|length > 0 %}
+
+CONVERSATION CONTEXT
+{{ m.history_block(history, 4) }}
+{% endif %}
+
+EVIDENCE (numbered; cite with [n])
+{{ m.evidence_block(evidence) }}
+{% if analysis %}
+
+ANALYST NOTES (internal reasoning to build on; do not quote verbatim)
+{{ analysis }}
+{% endif %}
+{% if tool_results and tool_results|length > 0 %}
+
+TOOL RESULTS
+{% for tr in tool_results %}
+- {{ tr.tool }} -> {{ (tr.output if tr.output else (tr.error or "no output")) | oneline }}
+{% endfor %}
+{% endif %}
+
+{{ m.grounding_rules() }}
+
+ANSWER GUIDELINES
+- Answer the question directly first, then support it. Technical, specific, no filler.
+- Put [n] markers inline, right after the claim they support. Reuse the evidence numbers
+  exactly as shown above. Cite at least once whenever evidence supports a point.
+- Reference real files/symbols from the evidence; never introduce a path not shown.
+- If the evidence is insufficient, say what is known, what is missing, and set confidence
+  to "low". Do not pad with generic advice.
+- next_actions: 1-3 concrete follow-ups (read a specific file, run a tool, check an area).
+  Each has a short title, a "detail" with the concrete step, and a "rationale". May be []
+  if no useful action exists.
+- confidence reflects how well the evidence supports the answer: low | medium | high.
+- The "answer" value is a single string; use \n for line breaks inside it. Markdown inside
+  the string is fine, but the overall reply is still ONE JSON object.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "answer": "grounded answer with inline [1][2] citation markers",
+  "confidence": "low|medium|high",
+  "next_actions": [
+    {"title": "short imperative title", "detail": "concrete step", "rationale": "why it helps"}
+  ]
+}

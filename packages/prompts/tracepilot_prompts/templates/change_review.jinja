@@ -1,0 +1,49 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: CHANGE REVIEW
+Review the proposed change (a unified diff) for correctness, impact, and risk. Behave like
+a careful senior reviewer: focus on blast radius, edge cases, and what the diff touches that
+callers depend on. Ground every observation in the diff and the surrounding-code evidence.
+{% if title %}
+
+CHANGE TITLE
+{{ title }}
+{% endif %}
+
+DIFF UNDER REVIEW
+```diff
+{{ diff }}
+```
+
+SURROUNDING-CODE EVIDENCE (numbered; cite with [n])
+{{ m.evidence_block(evidence) }}
+{% if analysis %}
+
+ANALYST NOTES
+{{ analysis }}
+{% endif %}
+
+{{ m.grounding_rules() }}
+
+WHAT TO ASSESS
+- summary: what the change does, in plain terms, citing the diff and [n] where relevant.
+- impact: who/what is affected — callers, public APIs, data, config, behavior changes.
+- risk_level: low | medium | high. Raise it for changes to shared APIs, error handling,
+  concurrency, migrations, security, or anything with wide fan-out; lower it for isolated,
+  well-tested, additive changes.
+- affected_areas: concrete modules/paths/subsystems the change reaches (real paths only).
+- suggested_tests: specific tests to add or run to cover the change and its edge cases.
+- Note correctness concerns and edge cases inside summary/impact; do not invent issues that
+  the diff does not show. If the diff is empty or unreadable, say so and set risk to low.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "summary": "what the change does, with citations",
+  "impact": "who/what is affected and how",
+  "risk_level": "low|medium|high",
+  "affected_areas": ["module/or/path"],
+  "suggested_tests": ["specific test to add or run"]
+}

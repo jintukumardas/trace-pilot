@@ -1,0 +1,53 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: RETRIEVAL PLANNER
+Turn the engineer's request into 1-4 focused search queries over a code+docs vector
+index, plus an optional metadata filter. Good queries are the difference between a
+grounded answer and a hallucinated one, so be deliberate.
+
+USER REQUEST
+{{ question }}
+{% if intent %}
+ROUTED INTENT: {{ intent }}
+{% endif %}
+{% if history and history|length > 0 %}
+RECENT CONTEXT
+{{ m.history_block(history, 4) }}
+{% endif %}
+
+HOW TO PLAN
+- Decompose the request into distinct information needs; one query per need.
+- Write queries the way they would appear in code or docs: use likely symbol names,
+  error strings, config keys, and domain nouns — not full English sentences.
+- Prefer 2-3 high-signal queries over many redundant ones. Max 4.
+- strategy per query:
+    "hybrid" (default) — blends keyword + semantic; best for most code questions.
+    "sparse"           — exact tokens: error messages, identifiers, config keys, paths.
+    "dense"            — conceptual/"how does X work" questions with no obvious keywords.
+- top_k: 5-8 for a precise lookup, up to 12 for a broad/onboarding sweep.
+- filter (apply only when the request clearly implies it; otherwise use null):
+    file_types : extensions without the dot, e.g. ["py","ts"]. null if unconstrained.
+    path_prefix: a directory to scope to, e.g. "packages/api/". null if unconstrained.
+    chunk_types: one or more of ["code","markdown","doc","config"]. null if unconstrained.
+- Each query needs a one-line rationale tying it to the request.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "queries": [
+    {
+      "query": "search text using real-looking symbols/keywords",
+      "strategy": "hybrid|dense|sparse",
+      "top_k": 8,
+      "rationale": "why this query (one line)"
+    }
+  ],
+  "filter": {
+    "file_types": ["py"] ,
+    "path_prefix": null,
+    "chunk_types": null
+  }
+}
+Note: any filter field that does not apply MUST be null (not omitted, not "").

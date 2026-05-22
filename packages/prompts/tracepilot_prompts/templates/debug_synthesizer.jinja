@@ -1,0 +1,78 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: DEBUG SYNTHESIZER
+Diagnose the reported problem and produce a structured root-cause analysis plus a fix
+plan, grounded strictly in the evidence and any tool results. Think like an on-call
+engineer triaging an incident: form hypotheses, rank them by evidence, propose safe steps.
+
+BUG REPORT
+{{ bug_report or question }}
+{% if stack_trace %}
+
+STACK TRACE
+```
+{{ stack_trace }}
+```
+{% endif %}
+{% if reproduction %}
+
+REPRODUCTION
+{{ reproduction }}
+{% endif %}
+
+EVIDENCE (numbered; reference by 0-based index in evidence_indices, cite in prose with [n])
+{{ m.evidence_block(evidence) }}
+{% if analysis %}
+
+ANALYST NOTES
+{{ analysis }}
+{% endif %}
+{% if tool_results and tool_results|length > 0 %}
+
+TOOL RESULTS
+{% for tr in tool_results %}
+- {{ tr.tool }} -> {{ (tr.output if tr.output else (tr.error or "no output")) | oneline }}
+{% endfor %}
+{% endif %}
+
+{{ m.grounding_rules() }}
+
+HOW TO DIAGNOSE
+- Map the symptom (and any stack-trace frames) to specific files/functions in the evidence.
+- Propose 1-3 root-cause hypotheses, most likely first. For each, set a confidence and list
+  the impacted files and the evidence indices that support it. evidence_indices are 0-based
+  positions into the evidence list above (the first item is index 0).
+- impacted_files (top level): the union of files most likely involved, as real paths from
+  the evidence only.
+- diagnostic_steps: concrete checks to confirm/refute the hypotheses (logs to add, values to
+  print, tests to run) — ordered, specific.
+- fix_plan: ordered steps to implement the fix; risks of the change; a test_strategy to
+  prove the fix; and a rollback describing how to revert safely.
+- If the evidence is too thin to locate the cause, say so in the summary, give your best
+  partial hypothesis at low confidence, and focus diagnostic_steps on gathering what's missing.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "summary": "what's going wrong, in 1-3 sentences, with [n] citations",
+  "root_cause_candidates": [
+    {
+      "hypothesis": "the suspected cause",
+      "confidence": "low|medium|high",
+      "impacted_files": ["path/from/evidence.py"],
+      "reasoning": "why the evidence supports this, citing [n]",
+      "evidence_indices": [0, 2]
+    }
+  ],
+  "impacted_files": ["path/from/evidence.py"],
+  "diagnostic_steps": ["step 1", "step 2"],
+  "fix_plan": {
+    "steps": ["ordered implementation step"],
+    "risks": ["what could break"],
+    "test_strategy": ["how to verify the fix"],
+    "rollback": "how to revert safely"
+  },
+  "confidence": "low|medium|high"
+}

@@ -1,0 +1,39 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: ROUTER
+Classify the engineer's message into a single intent so the right pipeline runs. You do
+NOT answer the question here — you only route it.
+
+CONVERSATION SO FAR
+{{ m.history_block(history) }}
+
+USER MESSAGE
+{{ question }}
+{% if mode %}
+REQUESTED UI MODE: {{ mode }}  (a hint; the true intent may differ)
+{% endif %}
+
+INTENT DEFINITIONS (choose exactly one):
+- "question"      : a factual "how/what/where/why does X work" question about the code.
+- "onboarding"    : wants an overview, architecture tour, "where do I start", how to run/build.
+- "debugging"     : reports a bug, error, exception, failing test, or unexpected behavior.
+- "change_review" : asks to review a diff/PR/proposed change for risk, impact, correctness.
+- "fix_plan"      : asks for a concrete plan to implement a fix or change (steps/tests/risks).
+- "smalltalk"     : greeting, thanks, meta, or anything not about this codebase.
+
+GUIDANCE
+- A stack trace or "throws/error/fails" almost always means "debugging".
+- "Is it safe to merge / what's the blast radius" means "change_review".
+- "How should I implement / what's the plan to fix" means "fix_plan".
+- repository_focus: list repo names or path hints the user explicitly mentions; [] if none.
+- Keep rationale to one sentence.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "intent": "question|onboarding|debugging|change_review|fix_plan|smalltalk",
+  "rationale": "one short sentence justifying the choice",
+  "repository_focus": ["repo-or-path-hint", "..."]
+}

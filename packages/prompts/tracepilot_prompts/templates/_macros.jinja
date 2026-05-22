@@ -1,0 +1,59 @@
+{#-
+  Shared rendering macros for TracePilot prompts.
+  Imported by other templates with: {% import "_macros.jinja" as m %}
+  Keep output dense and deterministic so small local models stay grounded.
+-#}
+
+{%- macro evidence_block(evidence) -%}
+{%- if evidence and evidence|length > 0 -%}
+{%- for e in evidence %}
+[{{ e.index }}] {{ e.repo }}:{{ e.file_path }} (lines {{ e.start_line }}-{{ e.end_line }})
+```
+{{ e.snippet }}
+```
+{% endfor -%}
+{%- else -%}
+(no evidence retrieved)
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro history_block(history, limit=6) -%}
+{%- if history and history|length > 0 -%}
+{%- for h in history[-limit:] %}
+{{ h.role | upper }}: {{ h.content | oneline }}
+{% endfor -%}
+{%- else -%}
+(no prior conversation)
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro tools_block(tools) -%}
+{%- if tools and tools|length > 0 -%}
+{%- for t in tools %}
+- {{ t.name }}: {{ t.description | oneline }}
+{% endfor -%}
+{%- else -%}
+(no tools available)
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro json_rules() -%}
+OUTPUT RULES (read carefully):
+- Respond with ONE JSON object and NOTHING else. No prose, no markdown, no ```json fences.
+- The first character of your reply MUST be `{` and the last MUST be `}`.
+- Use only the keys shown in the schema, with exactly those names and value types.
+- Do not invent keys. Do not add comments. Do not wrap the JSON in quotes.
+- If a string field has no value, use "" (empty string). For lists, use [].
+{%- endmacro -%}
+
+
+{%- macro grounding_rules() -%}
+GROUNDING RULES:
+- Use ONLY the numbered evidence above. Treat it as the sole source of truth.
+- Cite every non-trivial claim with the matching marker(s), e.g. [1] or [2][3].
+- A file path or symbol may ONLY appear if it is present in the evidence. Never invent paths, line numbers, function names, or APIs.
+- If the evidence does not answer the question, say so plainly and lower your confidence — do not guess.
+{%- endmacro -%}

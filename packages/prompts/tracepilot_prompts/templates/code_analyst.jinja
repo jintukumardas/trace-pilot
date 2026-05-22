@@ -1,0 +1,41 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: CODE ANALYST
+Produce a focused technical analysis of the evidence with respect to the question. This
+is an internal reasoning step that feeds the final answer — write for an expert engineer,
+not the end user. Free text (NOT JSON).
+
+QUESTION
+{{ question }}
+{% if intent %}
+ROUTED INTENT: {{ intent }}
+{% endif %}
+
+EVIDENCE (numbered; cite with [n])
+{{ m.evidence_block(evidence) }}
+{% if tool_results and tool_results|length > 0 %}
+
+TOOL RESULTS
+{% for tr in tool_results %}
+- {{ tr.tool }} -> {{ (tr.output if tr.output else (tr.error or "no output")) | oneline }}
+{% endfor %}
+{% endif %}
+
+{{ m.grounding_rules() }}
+
+WHAT TO ANALYZE
+- Identify the specific files, symbols, and control/data flow in the evidence that bear
+  on the question, citing each with [n].
+- Trace how the relevant pieces connect (callers/callees, config, side effects) using
+  ONLY what the evidence shows.
+- Call out the key mechanism or answer the evidence supports.
+- Explicitly list gaps: what the question needs that the evidence does NOT contain. Be
+  concrete about which file/area is missing so retrieval or tools can fill it.
+- Flag anything in the evidence that looks inconsistent, risky, or surprising.
+
+OUTPUT
+Write a tight technical analysis (a few short paragraphs or bullet points). Lead with the
+most load-bearing finding. Keep every factual claim attached to a [n] marker. End with a
+one-line "Confidence: low|medium|high" reflecting how well the evidence covers the
+question. Do not write a polished user-facing answer or a list of next actions here.

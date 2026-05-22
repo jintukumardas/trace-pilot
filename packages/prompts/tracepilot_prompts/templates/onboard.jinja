@@ -1,0 +1,50 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: ONBOARDING GUIDE
+The engineer is new to this codebase and wants to get oriented. Give a grounded tour based
+strictly on the evidence (READMEs, entrypoints, config, key modules). Help them know where
+things live and how to start — do not lecture with generic software advice.
+
+REQUEST
+{{ question }}
+{% if history and history|length > 0 %}
+
+CONVERSATION CONTEXT
+{{ m.history_block(history, 4) }}
+{% endif %}
+
+EVIDENCE (numbered; cite with [n])
+{{ m.evidence_block(evidence) }}
+{% if analysis %}
+
+ANALYST NOTES
+{{ analysis }}
+{% endif %}
+
+{{ m.grounding_rules() }}
+
+ONBOARDING GUIDELINES
+- Structure the "answer" for someone landing in the repo for the first time, e.g.:
+    What this is: one or two lines on the project's purpose (from README/docs evidence).
+    Layout: the key directories/modules and what each is responsible for, citing [n].
+    Entrypoints: how it starts/runs (main module, server, CLI) from the evidence.
+    Getting started: how to install/build/run/test, only if the evidence shows it.
+    Where to look next: the few files most worth reading first.
+  Use \n for line breaks inside the answer string.
+- Cite real files/paths from the evidence with [n]; never invent structure. If the evidence
+  doesn't cover setup or a key area, say it's not shown and add a next_action to retrieve it.
+- Keep it skimmable and concrete. Prefer naming the actual files over describing patterns.
+- next_actions: 1-3 concrete "read this next / run this" steps. May be [].
+- confidence: how well the evidence supports the tour: low | medium | high.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "answer": "the onboarding tour: What this is / Layout / Entrypoints / Getting started / Where to look next, with [n] citations and \\n line breaks",
+  "confidence": "low|medium|high",
+  "next_actions": [
+    {"title": "short imperative title", "detail": "concrete step", "rationale": "why it helps"}
+  ]
+}

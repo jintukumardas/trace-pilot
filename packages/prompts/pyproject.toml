@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracepilot-prompts"
+version = "0.1.0"
+description = "File-backed prompt templates and loader for TracePilot"
+requires-python = ">=3.11"
+dependencies = ["jinja2>=3.1,<4"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracepilot_prompts*"]
+
+[tool.setuptools.package-data]
+tracepilot_prompts = ["templates/*.md", "templates/*.jinja"]

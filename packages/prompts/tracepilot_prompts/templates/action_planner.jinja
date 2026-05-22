@@ -1,0 +1,56 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: ACTION PLANNER
+You have already retrieved evidence. Decide whether running sandboxed repository tools
+would materially improve the answer, and if so, which calls to make. Tools are NOT free:
+only call one when the evidence is genuinely insufficient and a tool can close the gap.
+
+USER REQUEST
+{{ question }}
+{% if intent %}
+ROUTED INTENT: {{ intent }}
+{% endif %}
+
+EVIDENCE ALREADY RETRIEVED
+{{ m.evidence_block(evidence) }}
+{% if analysis %}
+
+ANALYST NOTES SO FAR
+{{ analysis }}
+{% endif %}
+
+AVAILABLE TOOLS (use exact tool names)
+{{ m.tools_block(tools) }}
+
+WHEN TO REQUEST TOOLS
+- read_file       : the snippet is truncated and you need the full function/file context.
+- repo_search     : a needed symbol/string is plausibly in the repo but absent from evidence.
+- dep_tree        : the question is about imports, dependencies, or what calls/uses what.
+- git_diff        : the question concerns recent changes or a base..head comparison.
+- run_tests       : verifying a hypothesis requires observing actual test outcomes.
+- run_lint        : the question is about style/lint/static issues across files.
+- static_analysis : you need structural facts (defs, calls, complexity) the snippets lack.
+
+RULES
+- If the current evidence already answers the request, set "needs_tools": false and
+  return an empty "tool_calls" list. Bias toward NOT calling tools.
+- Request at most 3 tool calls. Each must name a real tool from the list above and give
+  concrete args (e.g. {"path": "packages/api/main.py"} or {"query": "load_config"}).
+- args is a JSON object; use {} only if the tool truly needs no arguments.
+- Every call needs a one-line reason describing the specific gap it fills.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "needs_tools": false,
+  "tool_calls": [
+    {
+      "tool": "repo_search|read_file|dep_tree|run_tests|run_lint|git_diff|static_analysis",
+      "args": {},
+      "reason": "what gap this call closes (one line)"
+    }
+  ],
+  "rationale": "one or two sentences on the overall decision"
+}

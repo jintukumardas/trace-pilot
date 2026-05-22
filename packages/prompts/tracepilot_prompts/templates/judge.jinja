@@ -1,0 +1,42 @@
+{% import "_macros.jinja" as m %}
+{% include "system_preamble.jinja" %}
+
+TASK: JUDGE
+You are an impartial evaluator. Score how well the candidate ANSWER is supported by the
+EVIDENCE and how well it addresses the QUESTION. Be strict: an answer that sounds good but
+cites unsupported claims must score low on grounding.
+
+QUESTION
+{{ question }}
+
+EVIDENCE (the only legitimate source the answer may draw on)
+{{ m.evidence_block(evidence) }}
+
+CANDIDATE ANSWER (to be judged)
+{{ answer }}
+
+SCORING RUBRIC (each 0.0-1.0, use the full range)
+- grounding   : fraction of the answer's factual claims that are directly supported by the
+                cited evidence. Penalize fabricated paths/symbols, wrong citations, and
+                claims with no evidence. 1.0 = every claim is backed; 0.0 = unsupported.
+- relevance   : how directly the answer addresses the actual question (not adjacent topics).
+- completeness: whether the answer covers the question and includes citations + sensible
+                next steps. Partial answers score in the middle.
+- confidence  : your overall confidence in the answer's correctness: low | medium | high.
+- issues      : short, specific problem strings (e.g. "claims file X but X not in evidence",
+                "no citations", "ignores the error in the stack trace"). [] if none.
+
+RULES
+- Judge only against the evidence above; do not use outside knowledge to fill gaps.
+- Round numeric scores to two decimals.
+
+{{ m.json_rules() }}
+
+SCHEMA (return exactly this shape):
+{
+  "grounding": 0.0,
+  "relevance": 0.0,
+  "completeness": 0.0,
+  "confidence": "low|medium|high",
+  "issues": ["specific issue", "..."]
+}
