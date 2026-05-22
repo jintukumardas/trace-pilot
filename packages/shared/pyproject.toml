@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracepilot-shared"
+version = "0.1.0"
+description = "Shared Pydantic models, settings and telemetry for TracePilot"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.6,<3",
+    "pydantic-settings>=2.2,<3",
+    "redis>=5.0,<6",
+    "langfuse>=2.50,<3",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracepilot_shared*"]
