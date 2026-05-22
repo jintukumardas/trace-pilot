@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracepilot-retrieval"
+version = "0.1.0"
+description = "Ingestion, chunking, embeddings and hybrid retrieval over Qdrant"
+requires-python = ">=3.11"
+dependencies = [
+    "tracepilot-shared",
+    "qdrant-client>=1.9,<2",
+    "fastembed>=0.3,<0.5",
+    "GitPython>=3.1,<4",
+    "tree-sitter-language-pack>=0.2,<1",
+    "rank-bm25>=0.2,<0.3",
+    "httpx>=0.27,<0.29",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracepilot_retrieval*"]
