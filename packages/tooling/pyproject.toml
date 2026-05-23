@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracepilot-tooling"
+version = "0.1.0"
+description = "Sandboxed, allowlisted developer tools (search, read, tests, lint, git diff)"
+requires-python = ">=3.11"
+dependencies = ["tracepilot-shared", "GitPython>=3.1,<4"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracepilot_tooling*"]
