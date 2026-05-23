@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracepilot-evals"
+version = "0.1.0"
+description = "Offline + online evaluation metrics and dataset runner for TracePilot"
+requires-python = ">=3.11"
+dependencies = [
+    "tracepilot-shared",
+    "tracepilot-retrieval",
+    "tracepilot-agent",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracepilot_evals*"]
+
+[tool.setuptools.package-data]
+"tracepilot_evals.datasets" = ["*.json"]

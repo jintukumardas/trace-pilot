@@ -1,0 +1,102 @@
+{
+  "name": "default",
+  "description": "Generic-codebase golden set covering architecture, retrieval, onboarding, debugging, and change-review. Labels are intentionally tech-agnostic so the set works against any indexed repository.",
+  "examples": [
+    {
+      "id": "arch-overview-01",
+      "question": "Give me a high-level overview of this codebase's architecture: what are the main packages/modules and how do they fit together?",
+      "mode": "onboard",
+      "expected_files": ["README.md", "docs/ARCHITECTURE.md", "pyproject.toml"],
+      "expected_keywords": ["package", "module", "service", "architecture"],
+      "notes": "Onboarding-style overview. A good answer names concrete top-level packages and cites a README/docs or manifest, not vague generalities."
+    },
+    {
+      "id": "entrypoint-02",
+      "question": "Where is the application entrypoint and what happens on startup?",
+      "mode": "ask",
+      "expected_files": ["main.py", "app.py", "__main__.py"],
+      "expected_keywords": ["entrypoint", "startup", "main", "initialize"],
+      "notes": "Should locate the main/app module and describe the startup/lifespan sequence with a citation to the entrypoint file."
+    },
+    {
+      "id": "config-03",
+      "question": "How is configuration loaded and which environment variables does the app read?",
+      "mode": "ask",
+      "expected_files": ["config.py", ".env.example", "settings.py"],
+      "expected_keywords": ["environment", "config", "settings", "variable"],
+      "notes": "Tests retrieval of config/settings code. Good answers reference the settings module and the env-var names."
+    },
+    {
+      "id": "data-model-04",
+      "question": "What are the core data models / schemas and where are they defined?",
+      "mode": "ask",
+      "expected_files": ["models.py", "schema.py", "models/__init__.py"],
+      "expected_keywords": ["model", "schema", "field", "type"],
+      "notes": "Checks that retrieval surfaces model/schema definitions and the answer cites the defining file(s)."
+    },
+    {
+      "id": "auth-flow-05",
+      "question": "Walk me through how authentication and authorization work in this service.",
+      "mode": "ask",
+      "expected_files": ["auth.py", "middleware.py", "security.py"],
+      "expected_keywords": ["auth", "token", "permission", "middleware"],
+      "notes": "Cross-cutting concern that usually spans multiple files; rewards breadth in retrieval. If the repo has no auth, a good answer says so rather than inventing one."
+    },
+    {
+      "id": "api-routes-06",
+      "question": "List the HTTP endpoints this service exposes and what each one does.",
+      "mode": "ask",
+      "expected_files": ["routes.py", "router.py", "api.py"],
+      "expected_keywords": ["endpoint", "route", "request", "response"],
+      "notes": "Should enumerate routes with methods/paths, grounded in the router/route definitions."
+    },
+    {
+      "id": "test-strategy-07",
+      "question": "How are tests organized and how do I run the test suite locally?",
+      "mode": "onboard",
+      "expected_files": ["tests/", "conftest.py", "Makefile"],
+      "expected_keywords": ["test", "pytest", "fixture", "run"],
+      "notes": "Onboarding question. A good answer cites the tests directory / Makefile and gives a concrete run command."
+    },
+    {
+      "id": "debug-null-08",
+      "question": "Users hit an AttributeError: 'NoneType' object has no attribute 'id' when loading a record. What is the likely root cause and how do I fix it?",
+      "mode": "debug",
+      "expected_files": ["models.py", "store.py", "repository.py"],
+      "expected_keywords": ["none", "null", "attribute", "missing", "guard"],
+      "notes": "Debug mode. Expect root-cause hypotheses pointing at an unchecked lookup returning None, plus a guard/return-early fix and a test suggestion."
+    },
+    {
+      "id": "debug-timeout-09",
+      "question": "Requests to the search endpoint intermittently time out under load. Help me find the bottleneck and propose a fix.",
+      "mode": "debug",
+      "expected_files": ["retriever.py", "search.py", "client.py"],
+      "expected_keywords": ["timeout", "latency", "performance", "bottleneck", "concurrency"],
+      "notes": "Performance debugging. Good answers reason about blocking calls / missing timeouts / N+1 retrieval and cite the relevant call site, with a concrete fix plan."
+    },
+    {
+      "id": "change-review-10",
+      "question": "Review this change: a new caching layer was added in front of the vector store's search() method. What are the risks and what should be tested?",
+      "mode": "change_review",
+      "expected_files": ["qdrant_store.py", "retriever.py", "cache.py"],
+      "expected_keywords": ["cache", "invalidation", "staleness", "risk", "test"],
+      "notes": "Change-review mode. Expect an impact summary, risk list (cache invalidation / staleness / memory), affected areas, and suggested tests, grounded in the search/store code."
+    },
+    {
+      "id": "dependency-11",
+      "question": "Which third-party dependencies does this project rely on most heavily, and where are they used?",
+      "mode": "ask",
+      "expected_files": ["pyproject.toml", "requirements.txt", "package.json"],
+      "expected_keywords": ["dependency", "import", "library", "package"],
+      "notes": "Tests dep-tree / import-map retrieval. Good answers name real dependencies from the manifest and cite usage sites."
+    },
+    {
+      "id": "logging-obs-12",
+      "question": "How does this service do logging and observability, and how would I trace a single request end to end?",
+      "mode": "ask",
+      "expected_files": ["logging.py", "telemetry.py", "tracing.py"],
+      "expected_keywords": ["log", "trace", "span", "observability"],
+      "notes": "Cross-cutting observability question. A grounded answer cites the logging/telemetry modules and explains the trace/span model."
+    }
+  ]
+}
