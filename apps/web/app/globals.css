@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================================
+   TracePilot theme tokens — dark slate, restrained indigo/cyan accent.
+   Channels are stored as space-separated RGB so Tailwind's <alpha-value>
+   modifier (e.g. `bg-surface/60`) works everywhere.
+   =========================================================================== */
+:root {
+  --bg: 9 11 17; /* near-black slate */
+  --surface: 15 18 27;
+  --surface-2: 20 24 35;
+  --elevated: 26 31 44;
+
+  --border: 38 44 60;
+  --border-strong: 56 64 84;
+
+  --fg: 226 232 240; /* slate-200 */
+  --muted: 148 163 184; /* slate-400 */
+  --faint: 100 116 139; /* slate-500 */
+
+  --accent: 99 102 241; /* indigo-500 */
+  --accent-fg: 238 242 255;
+  --cyan: 34 211 238; /* cyan-400 */
+
+  --ok: 34 197 94; /* green-500 */
+  --warn: 234 179 8; /* amber-500 */
+  --danger: 244 63 94; /* rose-500 */
+  --info: 56 189 248; /* sky-400 */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-fg antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Sensible focus ring for an a11y-correct keyboard experience. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent/70 ring-offset-2 ring-offset-bg;
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-fg;
+  }
+}
+
+@layer utilities {
+  /* Monospace utility for code, paths, hashes and other machine text. */
+  .mono {
+    font-family: var(--font-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+  }
+
+  /* Hairline grid texture occasionally used behind empty states. */
+  .grid-texture {
+    background-image:
+      linear-gradient(to right, rgb(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Clamp long single-line machine strings. */
+  .truncate-mono {
+    @apply mono truncate;
+  }
+}
+
+/* ===========================================================================
+   Scrollbars — thin, low-contrast, technical.
+   =========================================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border-strong)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--border-strong));
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--faint));
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
