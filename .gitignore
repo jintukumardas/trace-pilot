@@ -28,6 +28,9 @@ yarn-error.log*
 .env.local
 *.local
 
+# Claude Code
+.claude/
+
 # Editor / OS
 .DS_Store
 .idea/
@@ -36,6 +39,6 @@ yarn-error.log*
 
 # Models / caches
 .cache/
-models/
+/models/
 ollama/
 qdrant_storage/
